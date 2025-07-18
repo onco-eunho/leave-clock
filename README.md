@@ -28,7 +28,7 @@ python main.py -a 32:17:29 -c 10:23:37
 
 ```ini
 [app]
-default_required_time = "40:00:00"
+default_required_time = 40:00:00
 
 [messages]
 more_than_4_hours_left = "아직 네 시간 넘게 남았네요... 여유를 가지세요!🫠"
