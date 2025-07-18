@@ -31,11 +31,11 @@ python main.py -a 32:17:29 -c 10:23:37
 default_required_time = 40:00:00
 
 [messages]
-more_than_4_hours_left = "아직 네 시간 넘게 남았네요... 여유를 가지세요!🫠"
-more_than_2_hours_left = "아직 두 시간 넘게 남았네요... 일 좀 더 하셔야겠어요!🥹"
-less_than_1_hour_left  = "이제 한 시간도 안 남았네요! 힘내세요!🏃"
-work_done              = "수고하셨습니다! 퇴근 하세요!✌️"
-invalid_start_time     = "출근한지 얼마 안 된 것 같은데요? 출근 시간부터 다시 확인해 주세요!😅"
+more_than_4_hours_left = 아직 네 시간 넘게 남았네요... 여유를 가지세요!🫠
+more_than_2_hours_left = 아직 두 시간 넘게 남았네요... 일 좀 더 하셔야겠어요!🥹
+less_than_1_hour_left  = 이제 한 시간도 안 남았네요! 힘내세요!🏃
+work_done              = 수고하셨습니다! 퇴근 하세요!✌️
+invalid_start_time     = 출근한지 얼마 안 된 것 같은데요? 출근 시간부터 다시 확인해 주세요!😅
 ```
 
 - 추가로 cheer_up.py 파일 내용을 수정하면 좀 더 다양한 격려 메시지를 추가할 수 있습니다.
