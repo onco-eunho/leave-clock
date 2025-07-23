@@ -17,12 +17,25 @@ class Time:
     
     def to_timedelta(self):
         return timedelta(hours=self.hours, minutes=self.minutes, seconds=self.seconds)
-    
+
+
+def format_timedelta_to_total_hours(td):
+    if not isinstance(td, timedelta):
+        return td
+    total_seconds = td.total_seconds()
+    sign = "-" if total_seconds < 0 else ""
+    total_seconds = abs(total_seconds)
+    hours = int(total_seconds // 3600)
+    minutes = int((total_seconds % 3600) // 60)
+    seconds = int(total_seconds % 60)
+    return f"{sign}{hours:02}:{minutes:02}:{seconds:02}"
+
+
 def get_current_time():
     now = datetime.now()
     return Time(now.hour, now.minute, now.second)
 
-def calculate_end_time(required_time_str, accumulated_time_str, current_time_str):
+def calculate_end_time(required_time_str, accumulated_time_str, current_time_str, vacation_hours=0):
     try:
         time_delimiter = ':'
         
@@ -30,7 +43,10 @@ def calculate_end_time(required_time_str, accumulated_time_str, current_time_str
         accumulated_time = Time(*map(int, accumulated_time_str.split(time_delimiter))).to_timedelta()
         current_time = Time(*map(int, current_time_str.split(time_delimiter))).to_timedelta()
 
-        remaining_delta = required_time - accumulated_time
+        vacation_time = timedelta(hours=vacation_hours)
+        adjusted_required_time = required_time - vacation_time
+
+        remaining_delta = adjusted_required_time - accumulated_time
         end_time = current_time + remaining_delta
         rest_time = end_time - get_current_time().to_timedelta()
 
@@ -38,6 +54,42 @@ def calculate_end_time(required_time_str, accumulated_time_str, current_time_str
 
     except ValueError:
         return "잘못된 시간 형식입니다. HH:MM:SS 형식으로 입력해 주세요.", None
+
+def calculate_average_time_per_day(required_time_str, accumulated_time_str, completed_days, excluded_days=0, vacation_hours=0):
+    try:
+        time_delimiter = ':'
+        
+        required_time = Time(*map(int, required_time_str.split(time_delimiter))).to_timedelta()
+        accumulated_time = Time(*map(int, accumulated_time_str.split(time_delimiter))).to_timedelta()
+
+        vacation_time = timedelta(hours=vacation_hours)
+        adjusted_required_time = required_time - vacation_time
+
+        work_days_per_week = config.getint('app', 'work_days_per_week', fallback=5)
+        
+        # First, check if all work days are already marked as completed
+        if (work_days_per_week - completed_days) <= 0:
+            return "모든 근무일을 완료했습니다! 🎉", timedelta(0)
+
+        # Calculate remaining work time
+        remaining_work_time = adjusted_required_time - accumulated_time
+        if remaining_work_time.total_seconds() <= 0:
+             return "목표 근무 시간을 모두 채웠습니다! 🎉", timedelta(0)
+
+        # Calculate the actual number of days left to work
+        remaining_days_to_work = (work_days_per_week - completed_days) - excluded_days
+
+        if remaining_days_to_work <= 0:
+            return "남은 근무일이 없거나 제외할 날이 너무 많습니다.", None
+
+        average_seconds_per_day = remaining_work_time.total_seconds() / remaining_days_to_work
+        
+        avg_td = timedelta(seconds=average_seconds_per_day)
+
+        return None, avg_td
+
+    except (ValueError, configparser.NoOptionError) as e:
+        return f"계산 오류: {e}", None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="금요일의 퇴근 시간을 계산합니다. 필요 시간, 누적 시간, 출근 시간을 입력하세요.")
@@ -49,5 +101,5 @@ if __name__ == "__main__":
 
     end_time_result, rest_time_result = calculate_end_time(args.required_time, args.accumulated_time, args.current_time)
 
-    print(f"완료 시간: {end_time_result}, 잔여 시간: {rest_time_result}")
+    print(f"완료 시간: {format_timedelta_to_total_hours(end_time_result)}, 잔여 시간: {format_timedelta_to_total_hours(rest_time_result)}")
     print(get_cheer_message(rest_time_result, config))
