@@ -9,6 +9,7 @@
 ## 개발 환경
 
 <img src="https://img.shields.io/badge/Python-3.13-blue.svg" alt="Python Version">
+<img src="https://img.shields.io/badge/Gemini-CLI-blue.svg" alt="Gemini CLI Version">
 
 ## 사용법
 
