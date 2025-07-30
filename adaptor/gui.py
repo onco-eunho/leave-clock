@@ -87,7 +87,7 @@ class TimeKeeperApp:
             self._update_day_status_style(day_status_menu, day_status_var)
 
         # --- Calculate Button ---
-        calculate_button = ttk.Button(main_frame, text="퇴근 시간 계산", command=self.on_calculate, bootstyle=SUCCESS)
+        calculate_button = ttk.Button(main_frame, text="퇴근 시간 계산", command=self.on_calculate, bootstyle=PRIMARY)
         calculate_button.pack(fill=X, pady=15, ipady=5)
 
         # --- Result Display ---
@@ -206,6 +206,7 @@ class TimeKeeperApp:
         entry_widget.bind("<Command-v>", lambda e: entry_widget.event_generate("<<Paste>>"))
 
     def _update_day_status_style(self, combobox, status_var):
+        combobox.selection_clear()
         status = status_var.get()
         style_map = {
             DayStatus.WORK.value: "primary",

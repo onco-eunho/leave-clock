@@ -5,3 +5,6 @@ __pycache__/
 .venv
 .spec
 **/__init__.py
+
+.idea
+.DS_Store
