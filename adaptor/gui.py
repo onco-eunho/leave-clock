@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from tkinter import messagebox
+from datetime import datetime, timedelta
 from service.time_calculator import TimeCalculator, Time, format_timedelta_to_total_hours, DayStatus
 from service.cheer_up import get_cheer_message
 from PIL import Image, ImageTk
@@ -68,21 +69,37 @@ class TimeKeeperApp:
         ttk.Label(main_frame, text="근무일:").pack(fill=X, pady=(10, 0))
 
         self.day_status_vars = []
+        self.dated_day_status_vars = [] # To store (date, StringVar) tuples
         day_options = [status.value for status in DayStatus]
 
         days_frame = ttk.Frame(main_frame)
         days_frame.pack(fill=X, pady=5)
 
+        today = datetime.now().date()
+        # Calculate the date of the Monday of the current week
+        # weekday() returns 0 for Monday, 6 for Sunday
+        start_of_week = today - timedelta(days=today.weekday())
+
         for i in range(work_days_per_week):
+            current_day_date = start_of_week + timedelta(days=i)
+            
             day_frame = ttk.Frame(days_frame)
             day_frame.pack(side=LEFT, fill=X, expand=True, padx=5)
 
-            ttk.Label(day_frame, text=day_names[i]).pack()
+            # Display the actual day of the week (e.g., "월", "화")
+            ttk.Label(day_frame, text=day_names[current_day_date.weekday()]).pack()
 
-            day_status_var = ttk.StringVar(value=DayStatus.WORK.value)
+            day_status_var = ttk.StringVar()
+            # Auto-complete if the day is in the past (yesterday or earlier)
+            if current_day_date < today:
+                day_status_var.set(DayStatus.COMPLETED.value)
+            else:
+                day_status_var.set(DayStatus.WORK.value)
+            
             day_status_menu = ttk.Combobox(day_frame, textvariable=day_status_var, values=day_options, state="readonly", font=("Helvetica", 10), justify='center', width=5)
             day_status_menu.pack(pady=2, fill=X)
             self.day_status_vars.append(day_status_var)
+            self.dated_day_status_vars.append((current_day_date, day_status_var)) # Store date with var
             day_status_menu.bind("<<ComboboxSelected>>", lambda event, menu=day_status_menu, var=day_status_var: self._update_day_status_style(menu, var))
             self._update_day_status_style(day_status_menu, day_status_var)
 

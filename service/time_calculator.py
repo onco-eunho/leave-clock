@@ -78,7 +78,7 @@ class TimeCalculator:
 
             remaining_work_time = adjusted_required_time - accumulated_time
             if remaining_work_time.total_seconds() <= 0:
-                 return "목표 근무 시간을 모두 채웠습니다! 🎉", timedelta(0)
+                return "목표 근무 시간을 모두 채웠습니다! 🎉", timedelta(0)
 
             remaining_days_to_work = (work_days_per_week - completed_days) - excluded_days
 
